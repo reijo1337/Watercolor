@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "wet_map.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -13,9 +14,11 @@ MainWindow::MainWindow(QWidget *parent) :
     m_scene->setSceneRect(0, 0,
                           ui->m_mainView->width() - 2,
                           ui->m_mainView->height() - 2);
+    WetMap wetMap(ui->m_mainView->width() - 2,
+                  ui->m_mainView->height() - 2);
+    m_scene->setWetMap(wetMap);
     ui->m_mainView->setScene(m_scene);
     ui->m_mainView->setMouseTracking(true);
-    connect(m_scene, SIGNAL(mouseMoved(int,int)), this, SLOT(DrawBrushCircle(int,int)));
 }
 
 MainWindow::~MainWindow()

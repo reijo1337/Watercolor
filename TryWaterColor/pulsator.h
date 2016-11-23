@@ -8,6 +8,11 @@ class Pulsator : public QObject
 {
     Q_OBJECT
 public:
+    enum State {
+        Stoped,
+        Running
+    };
+
     explicit Pulsator(int pulseTime, QObject *parent = 0);
     void StartHeartbeat();
     void StopHeartbeat();

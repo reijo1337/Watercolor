@@ -1,6 +1,8 @@
 #ifndef PULSATOR_SINGLETON_H
 #define PULSATOR_SINGLETON_H
 
+#include <stdlib.h>
+
 template<typename T>
 class PulsatorSingleton
 {

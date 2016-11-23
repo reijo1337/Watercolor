@@ -2,13 +2,14 @@
 
 WetMap::WetMap(int width, int height) : m_width(width), m_height(height)
 {
-    this->m_wetMap = new char[m_width * m_height];
+    this->m_wetMap = new unsigned char[width * height];
 }
 
-void WetMap::Update()
+void WetMap::UpdateMap()
 {
     int i;
-    char w;
+    uchar w;
+    prepareGeometryChange();
     for (int y = 0; y < m_height; y++)
         for (int x = 0; x < m_width; x++) {
             i = x + y * m_width;
@@ -16,10 +17,12 @@ void WetMap::Update()
             if (w > 0)
                 m_wetMap[i]--;
         }
+    this->update(this->boundingRect());
 }
 
 void WetMap::Fill(int* xs, int* ys, int xOffset, int yOffset)
 {
+    prepareGeometryChange();
     int length = sizeof xs / sizeof xs[0];
     for (int i = 0; i < length; i++) {
         int x = xs[i] + xOffset;
@@ -29,6 +32,7 @@ void WetMap::Fill(int* xs, int* ys, int xOffset, int yOffset)
         int pixIndex = x + y * m_width;
         m_wetMap[pixIndex] = 255;
     }
+    this->update(this->boundingRect());
 }
 
 char WetMap::GetWater(int x, int y)
@@ -38,3 +42,22 @@ char WetMap::GetWater(int x, int y)
     int pixelIndex = x + y * m_width;
     return m_wetMap[pixelIndex];
 }
+
+void WetMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+//    m_threadLock.lock(); {
+//        PainterInThread *repaint = new PainterInThread(this, painter);
+//        QThreadPool::globalInstance()->start(repaint);
+//    } m_threadLock.unlock();
+            int i;
+            uchar w;
+            QImage image(m_width, m_height, QImage::Format_ARGB32_Premultiplied);
+            painter->setBackground(Qt::white);
+            for (int y = 0; y < m_height; y++)
+                for (int x = 0; x < m_width; x++) {
+                    i = x + y * m_width;
+                    w = this->m_wetMap[i];
+                    image.setPixelColor(x, y, QColor(0, 0, 255, (int) w));
+                }
+            painter->drawImage(0, 0, image);
+}
+

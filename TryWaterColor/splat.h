@@ -5,14 +5,41 @@
 #include <QList>
 #include <QPolygonF>
 #include <QColor>
+#include <QGraphicsItem>
+#include <QPainter>
+#include <QDebug>
+#include <QTime>
 #include "wet_map.h"
 
-class Splat
+class Splat : public QGraphicsItem
 {
 public:
+    Splat(QPointF offset, int width);
     Splat(QPointF offset, QPointF velocityBias, int width, int life, qreal roughness, qreal flow, qreal radialSpeed);
-    void UpdateShape(WetMap wetMap);
+    Splat(const Splat &obj);
+    Splat &operator =(const Splat &obj);
+    void UpdateShape(WetMap *wetMap);
+
+    QRectF boundingRect() const {
+        return m_vertices.boundingRect();
+    }
+
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                     QWidget *widget) {
+        painter->setBrush(m_initColor);
+        painter->setPen(m_initColor);
+        painter->drawPolygon(m_vertices);
+    }
+
+    QPainterPath shape () const {
+        QPainterPath path;
+        path.addPolygon(m_vertices);
+        return path;
+    }
+
     qreal CalcSize();
+
+    QTime startTime();
 private:
     const float alpha = 0.33f;
 
@@ -23,7 +50,7 @@ private:
     qreal m_flow;
     QPointF m_motionBias;
 
-    qreal m_startTime;
+    QTime m_startTime;
 
     qreal m_initSize;
     QColor m_initColor;

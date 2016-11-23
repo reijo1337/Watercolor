@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1242</width>
-    <height>781</height>
+    <height>788</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,10 +17,10 @@
    <widget class="QGraphicsView" name="m_mainView">
     <property name="geometry">
      <rect>
-      <x>9</x>
-      <y>9</y>
-      <width>861</width>
-      <height>521</height>
+      <x>10</x>
+      <y>10</y>
+      <width>1024</width>
+      <height>768</height>
      </rect>
     </property>
     <property name="cursor" stdset="0">
@@ -31,24 +31,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
- <connections>
-  <connection>
-   <sender>m_mainView</sender>
-   <signal>moved(int,int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>DrawBrushCircle(int,int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>921</x>
-     <y>454</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>1107</x>
-     <y>438</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
  <slots>
   <slot>DrawBrushCircle(int,int)</slot>
  </slots>
