@@ -11,9 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = TryWaterColor
 TEMPLATE = app
 
-QMAKE_LIBS+=-static -lgomp -lpthread
-
-QMAKE_CXXFLAGS+=-fopenmp
+QMAKE_CXXFLAGS += -fopenmp
+LIBS += -fopenmp
 
 SOURCES += main.cpp\
         mainwindow.cpp \

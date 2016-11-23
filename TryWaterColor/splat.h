@@ -14,11 +14,17 @@
 class Splat : public QGraphicsItem
 {
 public:
+    enum SplatState {
+        Alive,
+        Dead
+    };
+
     Splat(QPointF offset, int width);
-    Splat(QPointF offset, QPointF velocityBias, int width, int life, qreal roughness, qreal flow, qreal radialSpeed);
+    Splat(QPointF offset, QPointF velocityBias, int width, int life,
+          qreal roughness, qreal flow, qreal radialSpeed);
     Splat(const Splat &obj);
     Splat &operator =(const Splat &obj);
-    void UpdateShape(WetMap *wetMap);
+    int UpdateShape(WetMap *wetMap);
 
     QRectF boundingRect() const {
         return m_vertices.boundingRect();

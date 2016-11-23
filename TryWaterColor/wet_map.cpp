@@ -1,4 +1,5 @@
 #include "wet_map.h"
+#include <omp.h>
 
 WetMap::WetMap(int width, int height) : m_width(width), m_height(height)
 {
@@ -10,6 +11,9 @@ void WetMap::UpdateMap()
     int i;
     uchar w;
     prepareGeometryChange();
+#pragma omp parallel num_threads(1)
+{
+    #pragma omp for
     for (int y = 0; y < m_height; y++)
         for (int x = 0; x < m_width; x++) {
             i = x + y * m_width;
@@ -17,6 +21,7 @@ void WetMap::UpdateMap()
             if (w > 0)
                 m_wetMap[i]--;
         }
+}
     this->update(this->boundingRect());
 }
 
@@ -44,20 +49,21 @@ char WetMap::GetWater(int x, int y)
 }
 
 void WetMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-//    m_threadLock.lock(); {
-//        PainterInThread *repaint = new PainterInThread(this, painter);
-//        QThreadPool::globalInstance()->start(repaint);
-//    } m_threadLock.unlock();
-            int i;
-            uchar w;
-            QImage image(m_width, m_height, QImage::Format_ARGB32_Premultiplied);
-            painter->setBackground(Qt::white);
-            for (int y = 0; y < m_height; y++)
-                for (int x = 0; x < m_width; x++) {
-                    i = x + y * m_width;
-                    w = this->m_wetMap[i];
-                    image.setPixelColor(x, y, QColor(0, 0, 255, (int) w));
-                }
-            painter->drawImage(0, 0, image);
+    int i;
+    uchar w;
+    QImage image(m_width, m_height, QImage::Format_ARGB32_Premultiplied);
+    painter->setBackground(Qt::white);
+
+    #pragma omp parallel num_threads(1)
+    {
+        #pragma omp for
+        for (int y = 0; y < m_height; y++)
+            for (int x = 0; x < m_width; x++) {
+                i = x + y * m_width;
+                w = this->m_wetMap[i];
+                image.setPixelColor(x, y, QColor(0, 0, 255, (int) w));
+            }
+    }
+    painter->drawImage(0, 0, image);
 }
 

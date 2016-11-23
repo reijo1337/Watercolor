@@ -3,7 +3,7 @@
 #include <ctime>
 
 Splat::Splat(QPointF offset, int width)
-    : m_life(30), m_roughness(1.f), m_flow(1.f), m_motionBias(QPointF(0.f, 0.f))
+    : m_life(60), m_roughness(1.f), m_flow(1.f), m_motionBias(QPointF(0.f, 0.f))
 {
     srand(time(0));
     int r = width / 2;
@@ -66,25 +66,26 @@ Splat::Splat(const Splat &obj)
 
 Splat &Splat::operator =(const Splat &obj)
 {
-    m_vertices = obj.m_vertices;
-    m_velocities = obj.m_velocities;
-    m_life = obj.m_life;
-    m_roughness = obj.m_roughness;
-    m_flow = obj.m_flow;
-    m_motionBias = obj.m_motionBias;
+    Splat ret(QPoint(0,0),0);
+    ret.m_vertices = obj.m_vertices;
+    ret.m_velocities = obj.m_velocities;
+    ret.m_life = obj.m_life;
+    ret.m_roughness = obj.m_roughness;
+    ret.m_flow = obj.m_flow;
+    ret.m_motionBias = obj.m_motionBias;
 
-    m_startTime = obj.m_startTime;
+    ret.m_startTime = obj.m_startTime;
 
-    m_initSize = obj.m_initSize;
-    m_initColor = obj.m_initColor;
+    ret.m_initSize = obj.m_initSize;
+    ret.m_initColor = obj.m_initColor;
+
+    return ret;
 }
 
-#include <iostream>
-
-void Splat::UpdateShape(WetMap *wetMap)
+int Splat::UpdateShape(WetMap *wetMap)
 {
     if (m_life <= 0)
-        return;
+        return Splat::Dead;
     m_life--;
     prepareGeometryChange();
     for (int i = 0; i < m_vertices.length(); i++) {
@@ -96,17 +97,12 @@ void Splat::UpdateShape(WetMap *wetMap)
         QPointF x1 = x + m_flow * d + QPointF(ran, ran);
         uchar wet = wetMap->GetWater((int)x1.x(), (int)x1.y()); // Считываение количества жидкости
 
-        if ((int)wet > 0) {
-            if (i == m_vertices.length() - 1)
-            std::cout << (int)wet << " ";
+        if ((int)wet > 0)
             m_vertices[i] = x1;
-        }
-        else
-            if (i == m_vertices.length() - 1)
-            std::cout << "end ";
     }
 
     this->update(this->boundingRect());
+    return Splat::Alive;
 }
 
 qreal Splat::CalcSize()

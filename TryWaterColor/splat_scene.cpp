@@ -1,38 +1,21 @@
 #include "splat_scene.h"
 #include <QVector2D>
+#include <omp.h>
 
 // This method updates all splats and wet map
 void SplatScene::update()
 {
-    m_threadLock.lock(); {
-        if (m_nWetMapUpdateWorkers > 0)
-        {
-            m_threadLock.unlock();
-            return;
+    int checkSplat;
+        foreach (Splat* splat, *m_active) {
+            checkSplat = splat->UpdateShape(m_wetMap);
+            if (checkSplat == Splat::Dead)
+            {
+                m_locked->push_back(splat);
+                m_active->removeOne(splat);
+            }
         }
-    } m_threadLock.unlock();
 
-    m_locked->clear();
-    foreach (Splat* splat, *m_active) {
-        if (splat->startTime() < m_startTime) {
-            delete splat;
-        } else {
-            m_locked->push_back(splat);
-        }
-    }
-
-    m_active->swap(*m_locked);
-
-    foreach (Splat* splat, *m_active) {
-        splat->UpdateShape(m_wetMap);
-    }
-
-    m_threadLock.lock(); {
-        m_nWetMapUpdateWorkers++;
-        m_wetMap->UpdateMap();
-        WetMapUpdater *dryer = new WetMapUpdater(this);
-        QThreadPool::globalInstance()->start(dryer);
-    } m_threadLock.unlock();
+    m_wetMap->UpdateMap();
 }
 
 SplatScene::SplatScene()
@@ -44,8 +27,7 @@ SplatScene::SplatScene()
     m_locked = new QList<Splat*>();
     m_startTime = QTime::currentTime();
     timer = new QTimer();
-    timer->setInterval(50);
-    m_nWetMapUpdateWorkers = 0;
+    timer->setInterval(40);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
 }
 
