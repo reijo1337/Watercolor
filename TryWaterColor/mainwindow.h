@@ -18,6 +18,9 @@ public:
 protected:
     virtual void mouseMoveEvent(QMouseEvent *);
 
+private slots:
+    void on_colorPicker_clicked();
+
 private:
     SplatScene *m_scene;
     Ui::MainWindow *ui;

@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "wet_map.h"
+#include <QColorDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -19,6 +20,12 @@ MainWindow::MainWindow(QWidget *parent) :
     m_scene->setWetMap(wetMap);
     ui->m_mainView->setScene(m_scene);
     ui->m_mainView->setMouseTracking(true);
+
+    QPalette myPalette = ui->colorPicker->palette();
+    myPalette.setColor( ui->colorPicker->backgroundRole(), QColor(255,0,0) );
+    ui->colorPicker->setStyleSheet("background-color: " + QColor(Qt::red).name() + ";");
+
+    connect(ui->brushSize, SIGNAL(valueChanged(int)), m_scene, SLOT(updateBrushWidth(int)));
 }
 
 MainWindow::~MainWindow()
@@ -29,4 +36,17 @@ MainWindow::~MainWindow()
 void MainWindow::mouseMoveEvent(QMouseEvent *)
 {
     m_scene->disableCursor();
+    QPalette myPalette = ui->colorPicker->palette();
+    myPalette.setColor( ui->colorPicker->backgroundRole(), QColor(255,0,0) );
+    ui->colorPicker->setPalette( myPalette );
+}
+
+void MainWindow::on_colorPicker_clicked()
+{
+    QColor getColor;
+
+    getColor = QColorDialog::getColor(Qt::white, this);
+
+    ui->colorPicker->setStyleSheet("background-color: " + getColor.name() + ";");
+    m_scene->setSplatColor(getColor);
 }

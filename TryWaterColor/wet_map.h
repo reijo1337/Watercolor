@@ -4,6 +4,7 @@
 #include <QGraphicsItem>
 #include <QPainter>
 #include <QMutex>
+#include "watercolor_types.h"
 
 class WetMap : public QGraphicsItem
 {
@@ -20,7 +21,7 @@ public:
     }
 
     void UpdateMap();
-    void Fill(int *xs, int* ys, int xOffset, int yOffset);
+    void Fill(WaterRegion *wetPlace, QPointF pos);
     void FillAll() {
         int i;
         for (int y = 0; y < m_height; y++)

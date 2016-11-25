@@ -11,9 +11,9 @@ void WetMap::UpdateMap()
     int i;
     uchar w;
     prepareGeometryChange();
-#pragma omp parallel num_threads(1)
+//#pragma omp parallel num_threads(1)
 {
-    #pragma omp for
+    //#pragma omp for
     for (int y = 0; y < m_height; y++)
         for (int x = 0; x < m_width; x++) {
             i = x + y * m_width;
@@ -25,13 +25,12 @@ void WetMap::UpdateMap()
     this->update(this->boundingRect());
 }
 
-void WetMap::Fill(int* xs, int* ys, int xOffset, int yOffset)
+void WetMap::Fill(WaterRegion *wetPlace, QPointF pos)
 {
     prepareGeometryChange();
-    int length = sizeof xs / sizeof xs[0];
-    for (int i = 0; i < length; i++) {
-        int x = xs[i] + xOffset;
-        int y = ys[i] + yOffset;
+    foreach (QPoint wetDot, *wetPlace) {
+        int x = wetDot.x() + pos.x();
+        int y = wetDot.y() + pos.y();
         if (x < 0 || m_width <= x || y < 0 || m_height <= y)
             continue;
         int pixIndex = x + y * m_width;
@@ -54,9 +53,9 @@ void WetMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     QImage image(m_width, m_height, QImage::Format_ARGB32_Premultiplied);
     painter->setBackground(Qt::white);
 
-    #pragma omp parallel num_threads(1)
+//    #pragma omp parallel num_threads(1)
     {
-        #pragma omp for
+//        #pragma omp for
         for (int y = 0; y < m_height; y++)
             for (int x = 0; x < m_width; x++) {
                 i = x + y * m_width;

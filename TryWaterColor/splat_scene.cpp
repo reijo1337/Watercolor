@@ -15,12 +15,22 @@ void SplatScene::update()
             }
         }
 
-    m_wetMap->UpdateMap();
+        m_wetMap->UpdateMap();
 }
 
-SplatScene::SplatScene()
+void SplatScene::updateBrushWidth(int width)
 {
-    m_cursor = new QGraphicsEllipseItem(0,0,60,60);
+    m_brushWidth = width;
+    this->removeItem(m_cursor);
+    delete m_cursor;
+    m_cursor = new QGraphicsEllipseItem(0, 0, m_brushWidth, m_brushWidth);
+    this->addItem(m_cursor);
+    m_cursor->hide();
+}
+
+SplatScene::SplatScene() : m_splatColor(QColor(Qt::red)), m_brushWidth(45)
+{
+    m_cursor = new QGraphicsEllipseItem(0,0,m_brushWidth, m_brushWidth);
     m_cursor->hide();
     this->addItem(m_cursor);
     m_active = new QList<Splat*>();
@@ -29,9 +39,11 @@ SplatScene::SplatScene()
     timer = new QTimer();
     timer->setInterval(40);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+
+    generator = new GenSimpleBrushStrategy();
 }
 
-// Slot for disabling cursor when its outside
+// Slot for disabling cursor when it's outside
 void SplatScene::disableCursor()
 {
     if (m_cursor->isVisible())
@@ -42,42 +54,70 @@ void SplatScene::setWetMap(WetMap &wetMap)
 {
     m_wetMap = new WetMap(wetMap);
     this->addItem(m_wetMap);
-   // m_wetMap->hide();
-    m_wetMap->FillAll();
+    m_wetMap->hide();
+    //m_wetMap->FillAll();
 }
 
 void SplatScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     last_pos = event->scenePos();
-    Splat *newsplat = new Splat(event->scenePos(), 60);
-    this->addItem(newsplat);
-    m_active->push_back(newsplat);
+//    Splat *newsplat = new Splat(event->scenePos(), 60);
+//    this->addItem(newsplat);
+//    m_active->push_back(newsplat);
+    generator->Generate(this, event);
     if (!timer->isActive())
         timer->start();
 }
 
 void SplatScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    Splat *newsplat = new Splat(event->scenePos(), 60);
-    this->addItem(newsplat);
-    m_active->push_back(newsplat);
+//    Splat *newsplat = new Splat(event->scenePos(), 60);
+//    this->addItem(newsplat);
+//    m_active->push_back(newsplat);
+    generator->Generate(this, event);
 }
 
 void SplatScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     if (!m_cursor->isVisible())
         m_cursor->show();
-    m_cursor->setPos(event->scenePos().x() - 30, event->scenePos().y() - 30);
+    m_cursor->setPos(event->scenePos().x() - m_brushWidth / 2, event->scenePos().y() - m_brushWidth / 2);
 
-    if (event->buttons() == Qt::LeftButton) {
+    //if (event->buttons() == Qt::LeftButton) {
         QVector2D *m_len = new QVector2D(last_pos - event->scenePos());
         if (m_len->length() > 3) {
             last_pos = event->scenePos();
-            Splat *newsplat = new Splat(event->scenePos(), 60);
-            this->addItem(newsplat);
-            m_active->push_back(newsplat);
+//            Splat *newsplat = new Splat(event->scenePos(), 60);
+//            this->addItem(newsplat);
+//            m_active->push_back(newsplat);
+            generator->Generate(this, event);
         }
-    }
+    //}
     this->removeItem(m_cursor);
     this->addItem(m_cursor);
+}
+
+void SplatScene::pushBackSplat(Splat *splatToPush)
+{
+    m_active->push_back(splatToPush);
+}
+
+void SplatScene::fillWetMap(WaterRegion *placeForWetting, QPointF pos)
+{
+    m_wetMap->Fill(placeForWetting, pos);
+}
+
+QColor SplatScene::getSplatColor()
+{
+    return m_splatColor;
+}
+
+void SplatScene::setSplatColor(QColor color)
+{
+    m_splatColor = color;
+}
+
+int SplatScene::getBrushWitdh()
+{
+    return m_brushWidth;
 }

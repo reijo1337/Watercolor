@@ -18,7 +18,7 @@ private:
     PulsatorSingleton (const PulsatorSingleton&){}
 };
 
-template<typename T>
-T* PulsatorSingleton::myInstance = NULL;
+//template<typename T>
+//T* PulsatorSingleton::myInstance = NULL;
 
 #endif // PULSATOR_SINGLETON_H

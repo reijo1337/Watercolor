@@ -10,7 +10,10 @@
 #include <QTime>
 #include "splat.h"
 #include "wet_map.h"
+#include "watercolor_types.h"
+#include "strategy/splat_generator_strategy.h"
 
+class SplatGeneratorStrategy;
 
 // TODO: Настройки кисти, полупрозрачность, смешание, счетчики производительности
 // подложка текстуры бумаги.
@@ -19,10 +22,19 @@ class SplatScene : public QGraphicsScene
     Q_OBJECT
 public slots:
     void update();
+    void updateBrushWidth(int width);
 public:
     SplatScene();
     void disableCursor();
     void setWetMap(WetMap &wetMap);
+    void pushBackSplat(Splat *splatToPush);
+    void fillWetMap(WaterRegion *placeForWetting, QPointF pos);
+
+    QColor getSplatColor();
+    void setSplatColor(QColor color);
+
+    void setBrushWidth(int width);
+    int getBrushWitdh();
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
@@ -36,6 +48,10 @@ private:
     QTimer *timer;
 
     QTime m_startTime;
+
+    SplatGeneratorStrategy *generator;
+    QColor m_splatColor;
+    int m_brushWidth;
 };
 
 

@@ -1,9 +1,11 @@
 #include "splat.h"
 #include "stdlib.h"
 #include <ctime>
+#include <omp.h>
 
-Splat::Splat(QPointF offset, int width)
-    : m_life(60), m_roughness(1.f), m_flow(1.f), m_motionBias(QPointF(0.f, 0.f))
+Splat::Splat(QPointF offset, int width, QColor splatColor)
+    : m_life(30), m_roughness(1.f), m_flow(1.f),
+      m_motionBias(QPointF(0.f, 0.f)), m_initColor(splatColor)
 {
     srand(time(0));
     int r = width / 2;
@@ -20,13 +22,13 @@ Splat::Splat(QPointF offset, int width)
         m_velocities.push_back(QPointF(2.f * p.x(),
                                        2.f * p.y()));
     }
-    m_initColor.setRgb(255, 0, 0);
     m_initSize = CalcSize();
     m_startTime = QTime::currentTime();
 }
 
-Splat::Splat(QPointF offset, QPointF velocityBias, int width, int life, qreal roughness, qreal flow, qreal radialSpeed)
-    : m_life(life), m_roughness(roughness), m_flow(flow), m_motionBias(velocityBias)
+Splat::Splat(QPointF offset, QPointF velocityBias, int width, int life, qreal roughness, qreal flow, qreal radialSpeed, QColor splatColor)
+    : m_life(life), m_roughness(roughness), m_flow(flow),
+      m_motionBias(velocityBias), m_initColor(splatColor)
 {
     srand(time(0));
     int r = width / 2;
@@ -38,10 +40,10 @@ Splat::Splat(QPointF offset, QPointF velocityBias, int width, int life, qreal ro
     {
         p.setX(cos(i * dt));
         p.setY(sin(i * dt));
-        m_vertices[i].setX(static_cast <qreal> (r * p.x()) + offset.x());
-        m_vertices[i].setY(static_cast <qreal> (r * p.y()) + offset.y());
-        m_velocities[i].setX(radialSpeed * p.x());
-        m_velocities[i].setY(radialSpeed * p.y());
+        m_vertices.push_back(QPointF(static_cast <qreal> (r * p.x()) + offset.x(),
+                                     static_cast <qreal> (r * p.y()) + offset.y()));
+        m_velocities.push_back(QPointF(radialSpeed * p.x(),
+                                       radialSpeed * p.y()));
     }
     m_initColor.setRgb(255, 0, 0);
     m_initSize = CalcSize();
@@ -66,7 +68,7 @@ Splat::Splat(const Splat &obj)
 
 Splat &Splat::operator =(const Splat &obj)
 {
-    Splat ret(QPoint(0,0),0);
+    Splat ret(QPoint(0,0),0, QColor(Qt::red));
     ret.m_vertices = obj.m_vertices;
     ret.m_velocities = obj.m_velocities;
     ret.m_life = obj.m_life;
@@ -88,6 +90,10 @@ int Splat::UpdateShape(WetMap *wetMap)
         return Splat::Dead;
     m_life--;
     prepareGeometryChange();
+//#pragma omp parallel
+{
+//#pragma omp for
+
     for (int i = 0; i < m_vertices.length(); i++) {
         QPointF x = m_vertices[i];
         QPointF v = m_velocities[i];
@@ -100,7 +106,7 @@ int Splat::UpdateShape(WetMap *wetMap)
         if ((int)wet > 0)
             m_vertices[i] = x1;
     }
-
+}
     this->update(this->boundingRect());
     return Splat::Alive;
 }

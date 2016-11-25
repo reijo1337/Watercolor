@@ -19,9 +19,9 @@ public:
         Dead
     };
 
-    Splat(QPointF offset, int width);
+    Splat(QPointF offset, int width, QColor splatColor);
     Splat(QPointF offset, QPointF velocityBias, int width, int life,
-          qreal roughness, qreal flow, qreal radialSpeed);
+          qreal roughness, qreal flow, qreal radialSpeed, QColor splatColor);
     Splat(const Splat &obj);
     Splat &operator =(const Splat &obj);
     int UpdateShape(WetMap *wetMap);
