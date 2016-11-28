@@ -21,6 +21,12 @@ protected:
 private slots:
     void on_colorPicker_clicked();
 
+    void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
+
+    void on_pushButton_3_clicked();
+
 private:
     SplatScene *m_scene;
     Ui::MainWindow *ui;

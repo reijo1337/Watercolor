@@ -50,3 +50,18 @@ void MainWindow::on_colorPicker_clicked()
     ui->colorPicker->setStyleSheet("background-color: " + getColor.name() + ";");
     m_scene->setSplatColor(getColor);
 }
+
+void MainWindow::on_pushButton_clicked()
+{
+    m_scene->setSplatColor(QColor(Qt::red));
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    m_scene->setSplatColor(QColor(Qt::blue));
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    m_scene->setSplatColor(QColor(Qt::green));
+}

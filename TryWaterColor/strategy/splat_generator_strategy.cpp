@@ -2,6 +2,11 @@
 #include "cmath"
 #include <QVector2D>
 
+//double get_random(qreal min, qreal max)
+//{
+//    return (qreal)(rand())/RAND_MAX*(max - min) + min;
+//}
+
 void SplatGeneratorStrategy::CreateSimpleBrush(int width)
 {
     int r = width / 2;
@@ -20,9 +25,10 @@ void SplatGeneratorStrategy::CreateSimpleBrush(int width)
 
 void GenSimpleBrushStrategy::Generate(SplatScene *scene, QGraphicsSceneMouseEvent *event)
 {
+    QColor paintColor = scene->getSplatColor();
     int width = scene->getBrushWitdh();
     if (event->buttons() == Qt::LeftButton) {
-        Splat *newsplat = new Splat(event->scenePos(), width, scene->getSplatColor());
+        Splat *newsplat = new Splat(event->scenePos(), width, paintColor);
         scene->addItem(newsplat);
         scene->pushBackSplat(newsplat);
         this->CreateSimpleBrush(width);
@@ -32,6 +38,7 @@ void GenSimpleBrushStrategy::Generate(SplatScene *scene, QGraphicsSceneMouseEven
 
 void GenWetOnDryBrush::Generate(SplatScene *scene, QGraphicsSceneMouseEvent *event)
 {
+    QColor paintColor = scene->getSplatColor();
     int width = scene->getBrushWitdh();
     qreal radialSpeed = 2.f;
     int d = width / 2;
@@ -41,7 +48,7 @@ void GenWetOnDryBrush::Generate(SplatScene *scene, QGraphicsSceneMouseEvent *eve
         this->CreateSimpleBrush(width);
         scene->fillWetMap(m_water, event->scenePos());
 
-        Splat *newsplat = new Splat(event->scenePos(), width, scene->getSplatColor());
+        Splat *newsplat = new Splat(event->scenePos(), width, paintColor);
         scene->addItem(newsplat);
         scene->pushBackSplat(newsplat);
 
@@ -50,10 +57,9 @@ void GenWetOnDryBrush::Generate(SplatScene *scene, QGraphicsSceneMouseEvent *eve
             offset.setX(r * cos(theta));
             offset.setY(r * sin(theta));
 
-            delete newsplat;
             newsplat = new Splat(event->scenePos() + offset.toPointF(),
                                  0.1f * radialSpeed * offset.normalized().toPointF(),
-                                 d, 30, 0.5f * radialSpeed, 1.f, radialSpeed, scene->getSplatColor());
+                                 d, 30, 0.5f * radialSpeed, 1.f, radialSpeed, paintColor);
             scene->addItem(newsplat);
             scene->pushBackSplat(newsplat);
         }
@@ -62,14 +68,74 @@ void GenWetOnDryBrush::Generate(SplatScene *scene, QGraphicsSceneMouseEvent *eve
 
 void GenCruncyBrush::Generate(SplatScene *scene, QGraphicsSceneMouseEvent *event)
 {
+    QColor paintColor = scene->getSplatColor();
     int width = scene->getBrushWitdh();
     if (event->buttons() == Qt::LeftButton) {
         this->CreateSimpleBrush(width * 2);
         scene->fillWetMap(m_water, event->scenePos());
 
         Splat *newsplat = new Splat(event->scenePos(), QPointF(0, 0), width,
-                                    15, 5, 0.25f, 2.f, scene->getSplatColor());
+                                    15, 5, 0.25f, 2.f, paintColor);
         scene->addItem(newsplat);
         scene->pushBackSplat(newsplat);
+    }
+}
+
+void GenWetOnWetBrush::Generate(SplatScene *scene, QGraphicsSceneMouseEvent *event)
+{
+    QColor paintColor = scene->getSplatColor();
+    int width = scene->getBrushWitdh();
+    int smallD = width / 2;
+    int bigD = 3 * width / 2;
+
+    if (event->buttons() == Qt::LeftButton) {
+        this->CreateSimpleBrush(width);
+        scene->fillWetMap(m_water, event->scenePos());
+
+        Splat *newsplat = new Splat(event->scenePos(), QPointF(0, 0), bigD,
+                                    15, 5, 1.f, 2.f, paintColor);
+        scene->addItem(newsplat);
+        scene->pushBackSplat(newsplat);
+
+        newsplat = new Splat(event->scenePos(), QPointF(0, 0), smallD,
+                                    15, 5, 1.f, 2.f, paintColor);
+        scene->addItem(newsplat);
+        scene->pushBackSplat(newsplat);
+    }
+}
+
+void GenBlobbyBrush::Generate(SplatScene *scene, QGraphicsSceneMouseEvent *event)
+{
+    QColor paintColor = scene->getSplatColor();
+    int width = scene->getBrushWitdh();
+    qreal firstD = (qreal) width / 3;
+    qreal lastD = (qreal) width;
+    Splat *newsplat;
+    if (event->buttons() == Qt::LeftButton) {
+        this->CreateSimpleBrush(width);
+        scene->fillWetMap(m_water, event->scenePos());
+        for (int i = 0; i < 4; i++) {
+            qreal size = get_random(firstD, lastD);
+            QPointF pos;
+            switch (i) {
+            case 0:
+                pos = event->scenePos() + QPointF(0, (width - size) / 2);
+                break;
+            case 1:
+                pos = event->scenePos() + QPointF((width - size) / 2, 0);
+            case 2:
+                pos = event->scenePos() - QPointF(0, (width - size) / 2);
+                break;
+            case 3:
+                pos = event->scenePos() - QPointF((width - size) / 2, 0);
+            default:
+                break;
+            }
+
+            newsplat = new Splat(pos, QPointF(0, 0), size,
+                                 15, 5, 1.f, 2.f, paintColor);
+            scene->addItem(newsplat);
+            scene->pushBackSplat(newsplat);
+        }
     }
 }

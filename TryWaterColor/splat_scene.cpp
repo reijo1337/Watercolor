@@ -37,13 +37,12 @@ SplatScene::SplatScene() : m_splatColor(QColor(Qt::red)), m_brushWidth(45)
     m_locked = new QList<Splat*>();
     m_startTime = QTime::currentTime();
     timer = new QTimer();
-    timer->setInterval(40);
+    timer->setInterval(50);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
 
-    generator = new GenSimpleBrushStrategy();
+    generator = new GenWetOnWetBrush();
 }
 
-// Slot for disabling cursor when it's outside
 void SplatScene::disableCursor()
 {
     if (m_cursor->isVisible())
@@ -61,9 +60,6 @@ void SplatScene::setWetMap(WetMap &wetMap)
 void SplatScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     last_pos = event->scenePos();
-//    Splat *newsplat = new Splat(event->scenePos(), 60);
-//    this->addItem(newsplat);
-//    m_active->push_back(newsplat);
     generator->Generate(this, event);
     if (!timer->isActive())
         timer->start();
@@ -71,9 +67,6 @@ void SplatScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void SplatScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-//    Splat *newsplat = new Splat(event->scenePos(), 60);
-//    this->addItem(newsplat);
-//    m_active->push_back(newsplat);
     generator->Generate(this, event);
 }
 
@@ -83,16 +76,11 @@ void SplatScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         m_cursor->show();
     m_cursor->setPos(event->scenePos().x() - m_brushWidth / 2, event->scenePos().y() - m_brushWidth / 2);
 
-    //if (event->buttons() == Qt::LeftButton) {
-        QVector2D *m_len = new QVector2D(last_pos - event->scenePos());
-        if (m_len->length() > 3) {
-            last_pos = event->scenePos();
-//            Splat *newsplat = new Splat(event->scenePos(), 60);
-//            this->addItem(newsplat);
-//            m_active->push_back(newsplat);
-            generator->Generate(this, event);
-        }
-    //}
+    QVector2D *m_len = new QVector2D(last_pos - event->scenePos());
+    if (m_len->length() > 3) {
+        last_pos = event->scenePos();
+        generator->Generate(this, event);
+    }
     this->removeItem(m_cursor);
     this->addItem(m_cursor);
 }

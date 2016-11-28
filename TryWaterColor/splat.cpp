@@ -3,8 +3,14 @@
 #include <ctime>
 #include <omp.h>
 
+double get_random(qreal min, qreal max)
+{
+    return (qreal)(rand())/RAND_MAX*(max - min) + min;
+}
+
+
 Splat::Splat(QPointF offset, int width, QColor splatColor)
-    : m_life(30), m_roughness(1.f), m_flow(1.f),
+    : m_life(60), m_roughness(1.f), m_flow(1.f),
       m_motionBias(QPointF(0.f, 0.f)), m_initColor(splatColor)
 {
     srand(time(0));
@@ -27,7 +33,7 @@ Splat::Splat(QPointF offset, int width, QColor splatColor)
 }
 
 Splat::Splat(QPointF offset, QPointF velocityBias, int width, int life, qreal roughness, qreal flow, qreal radialSpeed, QColor splatColor)
-    : m_life(life), m_roughness(roughness), m_flow(flow),
+    : m_life(2*life), m_roughness(roughness), m_flow(flow),
       m_motionBias(velocityBias), m_initColor(splatColor)
 {
     srand(time(0));
@@ -45,7 +51,6 @@ Splat::Splat(QPointF offset, QPointF velocityBias, int width, int life, qreal ro
         m_velocities.push_back(QPointF(radialSpeed * p.x(),
                                        radialSpeed * p.y()));
     }
-    m_initColor.setRgb(255, 0, 0);
     m_initSize = CalcSize();
     m_startTime = QTime::currentTime();
 }
@@ -90,23 +95,21 @@ int Splat::UpdateShape(WetMap *wetMap)
         return Splat::Dead;
     m_life--;
     prepareGeometryChange();
-//#pragma omp parallel
-{
-//#pragma omp for
 
     for (int i = 0; i < m_vertices.length(); i++) {
         QPointF x = m_vertices[i];
         QPointF v = m_velocities[i];
         QPointF d = (1.f - alpha) * m_motionBias +
-                alpha / (1.f + static_cast <qreal> (rand()) / ( static_cast <qreal> (RAND_MAX/(m_roughness)))) * v;
-        qreal ran = -m_roughness + static_cast <qreal> (rand()) / ( static_cast <qreal> (RAND_MAX/(2*m_roughness)));
-        QPointF x1 = x + m_flow * d + QPointF(ran, ran);
+                alpha / get_random(1.1f, m_roughness) * v;
+        //qreal ran = -m_roughness + static_cast <qreal> (rand()) / ( static_cast <qreal> (RAND_MAX/(2*m_roughness)));
+        QPointF x1 = x + m_flow * d + QPointF(get_random(-m_roughness, m_roughness),
+                                              get_random(-m_roughness, m_roughness));
         uchar wet = wetMap->GetWater((int)x1.x(), (int)x1.y()); // Считываение количества жидкости
 
         if ((int)wet > 0)
             m_vertices[i] = x1;
     }
-}
+
     this->update(this->boundingRect());
     return Splat::Alive;
 }

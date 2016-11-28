@@ -11,6 +11,8 @@
 #include <QTime>
 #include "wet_map.h"
 
+double get_random(qreal min, qreal max);
+
 class Splat : public QGraphicsItem
 {
 public:
@@ -32,8 +34,13 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                      QWidget *widget) {
-        painter->setBrush(m_initColor);
-        painter->setPen(m_initColor);
+        QColor current;
+        current = m_initColor;
+        qreal size = (qreal) m_initSize / CalcSize();
+        qreal multip = size >= 1.f ? 255 : size * 255;
+        current.setAlpha(multip);
+        painter->setBrush(current);
+        painter->setPen(current);
         painter->drawPolygon(m_vertices);
     }
 

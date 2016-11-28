@@ -38,4 +38,16 @@ public:
     void Generate(SplatScene *scene, QGraphicsSceneMouseEvent *event);
 };
 
+class GenWetOnWetBrush : public SplatGeneratorStrategy
+{
+public:
+    void Generate(SplatScene *scene, QGraphicsSceneMouseEvent *event);
+};
+
+class GenBlobbyBrush : public SplatGeneratorStrategy
+{
+public:
+    void Generate(SplatScene *scene, QGraphicsSceneMouseEvent *event);
+};
+
 #endif // SPLATGENERATORSTRATEGY_H
