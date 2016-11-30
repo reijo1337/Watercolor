@@ -2,6 +2,7 @@
 #include "stdlib.h"
 #include <ctime>
 #include <omp.h>
+#include <QVector2D>
 
 double get_random(qreal min, qreal max)
 {
@@ -10,12 +11,12 @@ double get_random(qreal min, qreal max)
 
 
 Splat::Splat(QPointF offset, int width, QColor splatColor)
-    : m_life(60), m_roughness(1.f), m_flow(1.f),
+    : m_life(30), m_roughness(1.f), m_flow(1.f),
       m_motionBias(QPointF(0.f, 0.f)), m_initColor(splatColor)
 {
     srand(time(0));
     int r = width / 2;
-    int n = 25;
+    int n = 128;
 
     qreal dt = 2.f * M_PI / n;
     QPointF p;
@@ -33,12 +34,12 @@ Splat::Splat(QPointF offset, int width, QColor splatColor)
 }
 
 Splat::Splat(QPointF offset, QPointF velocityBias, int width, int life, qreal roughness, qreal flow, qreal radialSpeed, QColor splatColor)
-    : m_life(2*life), m_roughness(roughness), m_flow(flow),
+    : m_life(life), m_roughness(roughness), m_flow(flow),
       m_motionBias(velocityBias), m_initColor(splatColor)
 {
     srand(time(0));
     int r = width / 2;
-    int n = 25;
+    int n = 128;
 
     qreal dt = 2.f * M_PI / n;
     QPointF p;
@@ -112,6 +113,31 @@ int Splat::UpdateShape(WetMap *wetMap)
 
     this->update(this->boundingRect());
     return Splat::Alive;
+}
+
+void Splat::OptimizeShape()
+{
+    if (m_life <= 0)
+        return;
+
+    prepareGeometryChange();
+
+    QPolygonF new_vertices;
+    qreal arc_length = this->CalcSize() / m_vertices.length();
+    for (int i = 0; i < m_vertices.length(); i++) {
+        QVector2D offset;
+        int end_i = (i + 1) % m_vertices.length();
+        offset.setX(m_vertices[end_i].x() - m_vertices[i].x());
+        offset.setY(m_vertices[end_i].y() - m_vertices[i].y());
+        offset.normalize();
+        offset.setX(arc_length * offset.x());
+        offset.setY(arc_length * offset.y());
+        new_vertices.push_back(m_vertices[i] + offset.toPointF());
+    }
+
+    m_vertices.swap(new_vertices);
+
+    this->update(this->boundingRect());
 }
 
 qreal Splat::CalcSize()

@@ -26,7 +26,9 @@ public:
           qreal roughness, qreal flow, qreal radialSpeed, QColor splatColor);
     Splat(const Splat &obj);
     Splat &operator =(const Splat &obj);
+
     int UpdateShape(WetMap *wetMap);
+    void OptimizeShape();
 
     QRectF boundingRect() const {
         return m_vertices.boundingRect();

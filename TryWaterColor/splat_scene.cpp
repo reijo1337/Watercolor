@@ -8,6 +8,10 @@ void SplatScene::update()
     int checkSplat;
         foreach (Splat* splat, *m_active) {
             checkSplat = splat->UpdateShape(m_wetMap);
+            if (!optimizeIfNull) {
+                splat->OptimizeShape();
+                optimizeIfNull = 3;
+            }
             if (checkSplat == Splat::Dead)
             {
                 m_locked->push_back(splat);
@@ -16,11 +20,13 @@ void SplatScene::update()
         }
 
         m_wetMap->UpdateMap();
+        optimizeIfNull--;
 }
 
 void SplatScene::updateBrushWidth(int width)
 {
     m_brushWidth = width;
+    optimizeIfNull = 3;
     this->removeItem(m_cursor);
     delete m_cursor;
     m_cursor = new QGraphicsEllipseItem(0, 0, m_brushWidth, m_brushWidth);
@@ -40,7 +46,7 @@ SplatScene::SplatScene() : m_splatColor(QColor(Qt::red)), m_brushWidth(45)
     timer->setInterval(50);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
 
-    generator = new GenWetOnWetBrush();
+    generator = new GenBlobbyBrush();
 }
 
 void SplatScene::disableCursor()
@@ -108,4 +114,24 @@ void SplatScene::setSplatColor(QColor color)
 int SplatScene::getBrushWitdh()
 {
     return m_brushWidth;
+}
+
+void SplatScene::setGenerateStrategy(int id)
+{
+    delete generator;
+    switch (id) {
+    case Simple:
+        generator = new GenSimpleBrushStrategy();
+        break;
+    case WetOnDry:
+        generator = new GenWetOnDryBrush();
+    case Cruncy:
+        generator = new GenCruncyBrush();
+    case WetOnWet:
+        generator = new GenWetOnWetBrush();
+    case Blobby:
+        generator = new GenBlobbyBrush();
+    default:
+        break;
+    }
 }

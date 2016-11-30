@@ -24,6 +24,13 @@ public slots:
     void update();
     void updateBrushWidth(int width);
 public:
+    enum GenerateStrategy {
+        Simple,
+        WetOnDry,
+        Cruncy,
+        WetOnWet,
+        Blobby
+    };
     SplatScene();
     void disableCursor();
     void setWetMap(WetMap &wetMap);
@@ -35,6 +42,8 @@ public:
 
     void setBrushWidth(int width);
     int getBrushWitdh();
+
+    void setGenerateStrategy(int id);
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
@@ -52,6 +61,7 @@ private:
     SplatGeneratorStrategy *generator;
     QColor m_splatColor;
     int m_brushWidth;
+    int optimizeIfNull;
 };
 
 

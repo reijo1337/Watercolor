@@ -129,7 +129,7 @@
       <x>1040</x>
       <y>190</y>
       <width>171</width>
-      <height>131</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="font">
@@ -140,6 +140,47 @@
     <property name="title">
      <string>Brush type:</string>
     </property>
+    <widget class="QSplitter" name="splitter">
+     <property name="geometry">
+      <rect>
+       <x>3</x>
+       <y>35</y>
+       <width>138</width>
+       <height>150</height>
+      </rect>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <widget class="QRadioButton" name="simpleChoice">
+      <property name="text">
+       <string>Simple</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="wetOnDryCoice">
+      <property name="text">
+       <string>Wet-on-dry</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="cruncyChoice">
+      <property name="text">
+       <string>Cruncy</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="wetOnWetChoice">
+      <property name="text">
+       <string>Wet-on-wet</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="blobbChoice">
+      <property name="text">
+       <string>Blobby</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
  </widget>

@@ -65,3 +65,28 @@ void MainWindow::on_pushButton_3_clicked()
 {
     m_scene->setSplatColor(QColor(Qt::green));
 }
+
+void MainWindow::on_simpleChoice_clicked()
+{
+    m_scene->setGenerateStrategy(SplatScene::Simple);
+}
+
+void MainWindow::on_wetOnDryCoice_clicked()
+{
+    m_scene->setGenerateStrategy(SplatScene::WetOnDry);
+}
+
+void MainWindow::on_cruncyChoice_clicked()
+{
+    m_scene->setGenerateStrategy(SplatScene::Cruncy);
+}
+
+void MainWindow::on_wetOnWetChoice_clicked()
+{
+    m_scene->setGenerateStrategy(SplatScene::WetOnWet);
+}
+
+void MainWindow::on_blobbChoice_clicked()
+{
+    m_scene->setGenerateStrategy(SplatScene::Blobby);
+}

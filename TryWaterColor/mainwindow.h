@@ -27,6 +27,16 @@ private slots:
 
     void on_pushButton_3_clicked();
 
+    void on_simpleChoice_clicked();
+
+    void on_wetOnDryCoice_clicked();
+
+    void on_cruncyChoice_clicked();
+
+    void on_wetOnWetChoice_clicked();
+
+    void on_blobbChoice_clicked();
+
 private:
     SplatScene *m_scene;
     Ui::MainWindow *ui;
