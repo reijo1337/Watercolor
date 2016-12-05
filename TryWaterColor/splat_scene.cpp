@@ -36,6 +36,11 @@ void SplatScene::updateBrushWidth(int width)
 
 SplatScene::SplatScene() : m_splatColor(QColor(Qt::red)), m_brushWidth(45)
 {
+    QPixmap background;
+    background.load(":/samples/back1");
+    QBrush backBrush;
+    backBrush.setTexture(background);
+    this->setBackgroundBrush(backBrush);
     m_cursor = new QGraphicsEllipseItem(0,0,m_brushWidth, m_brushWidth);
     m_cursor->hide();
     this->addItem(m_cursor);
@@ -43,10 +48,10 @@ SplatScene::SplatScene() : m_splatColor(QColor(Qt::red)), m_brushWidth(45)
     m_locked = new QList<Splat*>();
     m_startTime = QTime::currentTime();
     timer = new QTimer();
-    timer->setInterval(50);
+    timer->setInterval(33);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
 
-    generator = new GenBlobbyBrush();
+    generator = new GenSimpleBrushStrategy();
 }
 
 void SplatScene::disableCursor()
@@ -83,7 +88,7 @@ void SplatScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     m_cursor->setPos(event->scenePos().x() - m_brushWidth / 2, event->scenePos().y() - m_brushWidth / 2);
 
     QVector2D *m_len = new QVector2D(last_pos - event->scenePos());
-    if (m_len->length() > 3) {
+    if (m_len->length() > m_brushWidth * 0.15) {
         last_pos = event->scenePos();
         generator->Generate(this, event);
     }

@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    //srand(time(0));
     ui->setupUi(this);
     setMouseTracking(true);
     centralWidget()->setMouseTracking(true);

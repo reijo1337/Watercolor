@@ -6,7 +6,7 @@
 
 double get_random(qreal min, qreal max)
 {
-    return (qreal)(rand())/RAND_MAX*(max - min) + min;
+    return (qreal)rand() / RAND_MAX*(max - min) + min;
 }
 
 
@@ -14,7 +14,8 @@ Splat::Splat(QPointF offset, int width, QColor splatColor)
     : m_life(30), m_roughness(1.f), m_flow(1.f),
       m_motionBias(QPointF(0.f, 0.f)), m_initColor(splatColor)
 {
-    srand(time(0));
+    m_initColor.setAlpha(75);
+
     int r = width / 2;
     int n = 128;
 
@@ -37,7 +38,7 @@ Splat::Splat(QPointF offset, QPointF velocityBias, int width, int life, qreal ro
     : m_life(life), m_roughness(roughness), m_flow(flow),
       m_motionBias(velocityBias), m_initColor(splatColor)
 {
-    srand(time(0));
+    m_initColor.setAlpha(75);
     int r = width / 2;
     int n = 128;
 
@@ -58,7 +59,6 @@ Splat::Splat(QPointF offset, QPointF velocityBias, int width, int life, qreal ro
 
 Splat::Splat(const Splat &obj)
 {
-    srand(time(0));
     m_vertices = obj.m_vertices;
     m_velocities = obj.m_velocities;
     m_life = obj.m_life;
@@ -94,16 +94,16 @@ int Splat::UpdateShape(WetMap *wetMap)
 {
     if (m_life <= 0)
         return Splat::Dead;
+
     m_life--;
     prepareGeometryChange();
 
     for (int i = 0; i < m_vertices.length(); i++) {
         QPointF x = m_vertices[i];
         QPointF v = m_velocities[i];
-        QPointF d = (1.f - alpha) * m_motionBias +
-                alpha / get_random(1.1f, m_roughness) * v;
-        //qreal ran = -m_roughness + static_cast <qreal> (rand()) / ( static_cast <qreal> (RAND_MAX/(2*m_roughness)));
-        QPointF x1 = x + m_flow * d + QPointF(get_random(-m_roughness, m_roughness),
+        QPointF d = (1.f - alpha) * m_motionBias + alpha / get_random(1.f, 1.f + m_roughness) * v;
+
+        QPointF x1 = x + m_flow * d; + QPointF(get_random(-m_roughness, m_roughness),
                                               get_random(-m_roughness, m_roughness));
         uchar wet = wetMap->GetWater((int)x1.x(), (int)x1.y()); // Считываение количества жидкости
 

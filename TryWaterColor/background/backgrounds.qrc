@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/samples">
+        <file>PAP_BASIC.TGA</file>
+        <file>back1</file>
+    </qresource>
+</RCC>

@@ -34,21 +34,36 @@ public:
         return m_vertices.boundingRect();
     }
 
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
-                     QWidget *widget) {
+    QColor getColor() {
         QColor current;
         current = m_initColor;
-        qreal size = (qreal) m_initSize / CalcSize();
-        qreal multip = size >= 1.f ? 255 : size * 255;
-        current.setAlpha(multip);
-        painter->setBrush(current);
-        painter->setPen(current);
-        painter->drawPolygon(m_vertices);
+        qreal multiply = m_initSize / CalcSize();
+        if (multiply < 0.f || multiply > 1.f)
+            multiply = 1;
+
+        current.setAlpha(current.alpha() * multiply);
+        return current;
+    }
+
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                     QWidget *widget) {
+        painter->setBrush(getColor());
+        painter->setPen(Qt::PenStyle::NoPen);
+        painter->drawPath(this->shape());
     }
 
     QPainterPath shape () const {
         QPainterPath path;
-        path.addPolygon(m_vertices);
+
+        int len = m_vertices.length();
+        path = *(new QPainterPath(m_vertices[0]));
+
+        for (int i = 0; i < len-2; i+=2) {
+            path.quadTo(m_vertices[i+1], m_vertices[i+2]);
+        }
+
+        path.quadTo(m_vertices[len-1], m_vertices[0]);
+
         return path;
     }
 

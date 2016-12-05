@@ -2,11 +2,6 @@
 #include "cmath"
 #include <QVector2D>
 
-//double get_random(qreal min, qreal max)
-//{
-//    return (qreal)(rand())/RAND_MAX*(max - min) + min;
-//}
-
 void SplatGeneratorStrategy::CreateSimpleBrush(int width)
 {
     int r = width / 2;
