@@ -12,7 +12,7 @@ void SplatScene::update()
                 splat->OptimizeShape();
                 optimizeIfNull = 3;
             }
-            if (checkSplat == Splat::Dead)
+            if (checkSplat == Splat::Dried)
             {
                 m_locked->push_back(splat);
                 m_active->removeOne(splat);
@@ -71,7 +71,6 @@ void SplatScene::setWetMap(WetMap &wetMap)
 void SplatScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     last_pos = event->scenePos();
-    generator->Generate(this, event);
     if (!timer->isActive())
         timer->start();
 }
@@ -88,7 +87,7 @@ void SplatScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     m_cursor->setPos(event->scenePos().x() - m_brushWidth / 2, event->scenePos().y() - m_brushWidth / 2);
 
     QVector2D *m_len = new QVector2D(last_pos - event->scenePos());
-    if (m_len->length() > m_brushWidth * 0.15) {
+    if (m_len->length() > m_brushWidth * 0.1) {
         last_pos = event->scenePos();
         generator->Generate(this, event);
     }

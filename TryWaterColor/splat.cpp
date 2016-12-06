@@ -93,7 +93,7 @@ Splat &Splat::operator =(const Splat &obj)
 int Splat::UpdateShape(WetMap *wetMap)
 {
     if (m_life <= 0)
-        return Splat::Dead;
+        return Splat::Dried;
 
     m_life--;
     prepareGeometryChange();
@@ -112,7 +112,7 @@ int Splat::UpdateShape(WetMap *wetMap)
     }
 
     this->update(this->boundingRect());
-    return Splat::Alive;
+    return Splat::Flowing;
 }
 
 void Splat::OptimizeShape()

@@ -17,8 +17,9 @@ class Splat : public QGraphicsItem
 {
 public:
     enum SplatState {
-        Alive,
-        Dead
+        Flowing,
+        Fixed,
+        Dried
     };
 
     Splat(QPointF offset, int width, QColor splatColor);
@@ -84,6 +85,8 @@ private:
 
     qreal m_initSize;
     QColor m_initColor;
+
+    QBrush brush;
 };
 
 #endif // SPLAT_H
