@@ -3,7 +3,8 @@
 
 #include <QGraphicsItem>
 #include <QPainter>
-#include <QMutex>
+#include <QVector>
+#include <QPointF>
 #include "watercolor_types.h"
 
 class WetMap : public QGraphicsItem
@@ -15,6 +16,7 @@ public:
         m_width = obj.m_width;
         m_height = obj.m_height;
         this->m_wetMap = new unsigned char[obj.m_width * obj.m_height];
+        this->m_waterVelocities = obj.m_waterVelocities;
     }
     ~WetMap() {
         delete[] m_wetMap;
@@ -34,8 +36,7 @@ public:
     char GetWater(int x, int y);
 
     QRectF boundingRect() const {
-        return QRectF( 0, 0,
-                      m_width, m_height);
+        return QRectF(0, 0, m_width, m_height);
     }
 
     QPainterPath shape () const {
@@ -48,9 +49,9 @@ public:
                      QWidget *widget);
 private:
     uchar* m_wetMap;
+    QVector<QPointF> m_waterVelocities;
     int m_width;
     int m_height;
-    QMutex m_threadLock;
 };
 
 #endif // WETMAP_H

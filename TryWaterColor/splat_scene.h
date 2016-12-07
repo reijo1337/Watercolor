@@ -52,6 +52,7 @@ private:
     QPointF last_pos;
     QGraphicsEllipseItem *m_cursor;
     QList<Splat*> *m_active;
+    QList<Splat*> *m_fixed;
     QList<Splat*> *m_locked;
     WetMap *m_wetMap;
     QTimer *timer;

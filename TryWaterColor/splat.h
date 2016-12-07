@@ -29,7 +29,6 @@ public:
     Splat &operator =(const Splat &obj);
 
     int UpdateShape(WetMap *wetMap);
-    void OptimizeShape();
 
     QRectF boundingRect() const {
         return m_vertices.boundingRect();
@@ -87,6 +86,8 @@ private:
     QColor m_initColor;
 
     QBrush brush;
+
+    int m_fix;
 };
 
 #endif // SPLAT_H

@@ -21,6 +21,7 @@ Splat::Splat(QPointF offset, int width, QColor splatColor)
 
     qreal dt = 2.f * M_PI / n;
     QPointF p;
+
     for (int i = 0; i < n; i++)
     {
         p.setX(cos(i * dt));
@@ -92,52 +93,37 @@ Splat &Splat::operator =(const Splat &obj)
 
 int Splat::UpdateShape(WetMap *wetMap)
 {
-    if (m_life <= 0)
-        return Splat::Dried;
+    if (m_life <= 0) {
+        if (m_fix <= 0) {
+            return Splat::Dried;
+        } else {
+            m_fix--;
+            return Splat::Fixed;
+        }
+    }
 
     m_life--;
     prepareGeometryChange();
 
-    for (int i = 0; i < m_vertices.length(); i++) {
-        QPointF x = m_vertices[i];
-        QPointF v = m_velocities[i];
-        QPointF d = (1.f - alpha) * m_motionBias + alpha / get_random(1.f, 1.f + m_roughness) * v;
+    #pragma omp parallel
+    {
+        #pragma omp for
+        for (int i = 0; i < m_vertices.length(); i++) {
+            QPointF x = m_vertices[i];
+            QPointF v = m_velocities[i];
+            QPointF d = (1.f - alpha) * m_motionBias + alpha / get_random(1.f, 1.f + m_roughness) * v;
 
-        QPointF x1 = x + m_flow * d; + QPointF(get_random(-m_roughness, m_roughness),
-                                              get_random(-m_roughness, m_roughness));
-        uchar wet = wetMap->GetWater((int)x1.x(), (int)x1.y()); // Считываение количества жидкости
+            QPointF x1 = x + m_flow * d; + QPointF(get_random(-m_roughness, m_roughness),
+                                                   get_random(-m_roughness, m_roughness));
+            uchar wet = wetMap->GetWater((int)x1.x(), (int)x1.y()); // Считываение количества жидкости
 
-        if ((int)wet > 0)
-            m_vertices[i] = x1;
+            if ((int)wet > 0)
+               m_vertices[i] = x1;
+        }
     }
 
     this->update(this->boundingRect());
     return Splat::Flowing;
-}
-
-void Splat::OptimizeShape()
-{
-    if (m_life <= 0)
-        return;
-
-    prepareGeometryChange();
-
-    QPolygonF new_vertices;
-    qreal arc_length = this->CalcSize() / m_vertices.length();
-    for (int i = 0; i < m_vertices.length(); i++) {
-        QVector2D offset;
-        int end_i = (i + 1) % m_vertices.length();
-        offset.setX(m_vertices[end_i].x() - m_vertices[i].x());
-        offset.setY(m_vertices[end_i].y() - m_vertices[i].y());
-        offset.normalize();
-        offset.setX(arc_length * offset.x());
-        offset.setY(arc_length * offset.y());
-        new_vertices.push_back(m_vertices[i] + offset.toPointF());
-    }
-
-    m_vertices.swap(new_vertices);
-
-    this->update(this->boundingRect());
 }
 
 qreal Splat::CalcSize()

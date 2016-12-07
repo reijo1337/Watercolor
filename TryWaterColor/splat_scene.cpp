@@ -8,10 +8,7 @@ void SplatScene::update()
     int checkSplat;
         foreach (Splat* splat, *m_active) {
             checkSplat = splat->UpdateShape(m_wetMap);
-            if (!optimizeIfNull) {
-                splat->OptimizeShape();
-                optimizeIfNull = 3;
-            }
+
             if (checkSplat == Splat::Dried)
             {
                 m_locked->push_back(splat);
@@ -20,7 +17,6 @@ void SplatScene::update()
         }
 
         m_wetMap->UpdateMap();
-        optimizeIfNull--;
 }
 
 void SplatScene::updateBrushWidth(int width)
@@ -65,12 +61,12 @@ void SplatScene::setWetMap(WetMap &wetMap)
     m_wetMap = new WetMap(wetMap);
     this->addItem(m_wetMap);
     m_wetMap->hide();
-    //m_wetMap->FillAll();
 }
 
 void SplatScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     last_pos = event->scenePos();
+    generator->Generate(this, event);
     if (!timer->isActive())
         timer->start();
 }
