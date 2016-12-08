@@ -32,6 +32,14 @@ public:
         Blobby
     };
     SplatScene();
+    ~SplatScene()
+    {
+        delete m_cursor;
+        delete m_active;
+        delete m_fixed;
+        delete timer;
+    }
+
     void disableCursor();
     void setWetMap(WetMap &wetMap);
     void pushBackSplat(Splat *splatToPush);
@@ -44,6 +52,10 @@ public:
     int getBrushWitdh();
 
     void setGenerateStrategy(int id);
+    void VisualWet(bool wha);
+    void ClearAll();
+
+    void RewetSplats(WaterRegion *m_water, QPointF pos);
 protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *event);
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
@@ -53,7 +65,6 @@ private:
     QGraphicsEllipseItem *m_cursor;
     QList<Splat*> *m_active;
     QList<Splat*> *m_fixed;
-    QList<Splat*> *m_locked;
     WetMap *m_wetMap;
     QTimer *timer;
 

@@ -16,7 +16,8 @@ public:
         m_width = obj.m_width;
         m_height = obj.m_height;
         this->m_wetMap = new unsigned char[obj.m_width * obj.m_height];
-        this->m_waterVelocities = obj.m_waterVelocities;
+        this->m_waterVelocitiesX = obj.m_waterVelocitiesX;
+        this->m_waterVelocitiesY = obj.m_waterVelocitiesY;
     }
     ~WetMap() {
         delete[] m_wetMap;
@@ -34,6 +35,7 @@ public:
     }
 
     char GetWater(int x, int y);
+    QPointF GetVelocity(int x, int y);
 
     QRectF boundingRect() const {
         return QRectF(0, 0, m_width, m_height);
@@ -47,9 +49,25 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                      QWidget *widget);
+    void Clear() {
+        prepareGeometryChange();
+
+        int i;
+        for (int y = 0; y < m_height; y++)
+            for (int x = 0; x < m_width; x++) {
+                i = x + y * m_width;
+                this->m_wetMap[i] = 0;
+                this->m_waterVelocitiesX[i] = 0;
+                this->m_waterVelocitiesY[i] = 0;
+            }
+
+        this->update(this->boundingRect());
+    }
+
 private:
     uchar* m_wetMap;
-    QVector<QPointF> m_waterVelocities;
+    float* m_waterVelocitiesX;
+    float* m_waterVelocitiesY;
     int m_width;
     int m_height;
 };

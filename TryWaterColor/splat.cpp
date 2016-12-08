@@ -11,10 +11,11 @@ double get_random(qreal min, qreal max)
 
 
 Splat::Splat(QPointF offset, int width, QColor splatColor)
-    : m_life(30), m_roughness(1.f), m_flow(1.f),
+    : m_life(60), m_roughness(1.f), m_flow(1.f),
       m_motionBias(QPointF(0.f, 0.f)), m_initColor(splatColor)
 {
-    m_initColor.setAlpha(75);
+    m_fix = 60;
+    m_initColor.setAlpha(50);
 
     int r = width / 2;
     int n = 128;
@@ -36,10 +37,11 @@ Splat::Splat(QPointF offset, int width, QColor splatColor)
 }
 
 Splat::Splat(QPointF offset, QPointF velocityBias, int width, int life, qreal roughness, qreal flow, qreal radialSpeed, QColor splatColor)
-    : m_life(life), m_roughness(roughness), m_flow(flow),
+    : m_life(2*life), m_roughness(roughness), m_flow(flow),
       m_motionBias(velocityBias), m_initColor(splatColor)
 {
-    m_initColor.setAlpha(75);
+    m_fix = 60;
+    m_initColor.setAlpha(50);
     int r = width / 2;
     int n = 128;
 
@@ -63,6 +65,7 @@ Splat::Splat(const Splat &obj)
     m_vertices = obj.m_vertices;
     m_velocities = obj.m_velocities;
     m_life = obj.m_life;
+    m_fix = obj.m_fix;
     m_roughness = obj.m_roughness;
     m_flow = obj.m_flow;
     m_motionBias = obj.m_motionBias;
@@ -79,6 +82,7 @@ Splat &Splat::operator =(const Splat &obj)
     ret.m_vertices = obj.m_vertices;
     ret.m_velocities = obj.m_velocities;
     ret.m_life = obj.m_life;
+    ret.m_fix = obj.m_fix;
     ret.m_roughness = obj.m_roughness;
     ret.m_flow = obj.m_flow;
     ret.m_motionBias = obj.m_motionBias;
@@ -124,6 +128,29 @@ int Splat::UpdateShape(WetMap *wetMap)
 
     this->update(this->boundingRect());
     return Splat::Flowing;
+}
+
+int Splat::RewetShape(WaterRegion *wetPlace, WetMap *wetMap, QPointF &pos)
+{
+    int howMuch = 0;
+    #pragma omp parallel
+    {
+        #pragma omp for
+        for (int i = 0; i < m_vertices.length(); i++) {
+            if (wetPlace->contains((m_vertices[i] - pos).toPoint())) {
+                m_velocities[i] = wetMap->GetVelocity(m_vertices[i].toPoint().x(),
+                                                      m_vertices[i].toPoint().y());
+                howMuch++;
+            }
+        }
+    }
+
+    if (howMuch) {
+        m_life = 30;
+        m_fix = 30;
+        return Splat::Flowing;
+    } else
+        return Splat::Fixed;
 }
 
 qreal Splat::CalcSize()

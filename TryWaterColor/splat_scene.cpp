@@ -9,10 +9,14 @@ void SplatScene::update()
         foreach (Splat* splat, *m_active) {
             checkSplat = splat->UpdateShape(m_wetMap);
 
+            if (checkSplat == Splat::Fixed)
+            {
+                m_fixed->push_back(splat);
+                m_active->removeOne(splat);
+            }
             if (checkSplat == Splat::Dried)
             {
-                m_locked->push_back(splat);
-                m_active->removeOne(splat);
+                m_fixed->removeOne(splat);
             }
         }
 
@@ -41,7 +45,7 @@ SplatScene::SplatScene() : m_splatColor(QColor(Qt::red)), m_brushWidth(45)
     m_cursor->hide();
     this->addItem(m_cursor);
     m_active = new QList<Splat*>();
-    m_locked = new QList<Splat*>();
+    m_fixed = new QList<Splat*>();
     m_startTime = QTime::currentTime();
     timer = new QTimer();
     timer->setInterval(33);
@@ -133,5 +137,44 @@ void SplatScene::setGenerateStrategy(int id)
         generator = new GenBlobbyBrush();
     default:
         break;
+    }
+}
+
+void SplatScene::VisualWet(bool wha)
+{
+    if (wha)
+        m_wetMap->show();
+    else
+        m_wetMap->hide();
+}
+
+void SplatScene::ClearAll()
+{
+    timer->stop();
+    foreach (Splat* splat, *m_active) {
+        this->removeItem(splat);
+    }
+    foreach (Splat* splat, *m_fixed) {
+        this->removeItem(splat);
+    }
+    m_active->clear();
+    m_fixed->clear();
+    m_wetMap->Clear();
+}
+
+void SplatScene::RewetSplats(WaterRegion *m_water, QPointF pos)
+{
+//    QList<int> spltIndex;
+//    for (int i = 0; i < m_fixed->length(); i++) {
+//        if (splat->RewetShape(m_water, m_wetMap, pos) == Splat::Flowing)
+//            spltIndex.push_back(i);
+//    }
+
+    foreach (Splat* splat, *m_fixed) {
+        if (splat->RewetShape(m_water, m_wetMap, pos) == Splat::Flowing) {
+            m_active->push_back(splat);
+            m_fixed->removeOne(splat);
+        }
+
     }
 }

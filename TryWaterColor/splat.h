@@ -29,6 +29,7 @@ public:
     Splat &operator =(const Splat &obj);
 
     int UpdateShape(WetMap *wetMap);
+    int RewetShape(WaterRegion *wetPlace, WetMap *wetMap, QPointF &pos);
 
     QRectF boundingRect() const {
         return m_vertices.boundingRect();

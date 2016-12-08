@@ -6,7 +6,8 @@
 WetMap::WetMap(int width, int height) : m_width(width), m_height(height)
 {
     this->m_wetMap = new unsigned char[width * height];
-    this->m_waterVelocities = *(new QVector<QPointF>(width * height));
+    this->m_waterVelocitiesX = new float[width * height];
+    this->m_waterVelocitiesY = new float[width * height];
 }
 
 void WetMap::UpdateMap()
@@ -14,21 +15,22 @@ void WetMap::UpdateMap()
     int i;
     uchar w;
     prepareGeometryChange();
-//#pragma omp parallel num_threads(3)
-{
-    //#pragma omp for
-    for (int y = 0; y < m_height; y++)
-        for (int x = 0; x < m_width; x++) {
+
+    int x, y;
+    #pragma omp for /*private(x)*/
+    for (y = 0; y < m_height; y++)
+        for (x = 0; x < m_width; x++) {
             i = x + y * m_width;
             w = m_wetMap[i];
             if (w > 0) {
                 m_wetMap[i]--;
             } else {
-//                m_waterVelocities[i].setX(0);
-//                m_waterVelocities[i].setY(0);
+                m_waterVelocitiesX[i] = 0;
+                m_waterVelocitiesY[i] = 0;
             }
         }
-}
+
+
     this->update(this->boundingRect());
 }
 
@@ -48,10 +50,10 @@ void WetMap::Fill(WaterRegion *wetPlace, QPointF pos)
         int pixIndex = x + y * m_width;
         m_wetMap[pixIndex] = 255;
 
-        pr = m_waterVelocities[pixIndex] + p;
+        pr = QPointF(m_waterVelocitiesX[pixIndex], m_waterVelocitiesY[pixIndex]) + p;
 
-        m_waterVelocities[pixIndex].setX(2.f * pr.x() / pr.manhattanLength());
-        m_waterVelocities[pixIndex].setY(2.f * pr.y() / pr.manhattanLength());
+        m_waterVelocitiesX[pixIndex] = 2.f * pr.x() / pr.manhattanLength();
+        m_waterVelocitiesY[pixIndex] = 2.f * pr.y() / pr.manhattanLength();
     }
     this->update(this->boundingRect());
 }
@@ -64,6 +66,14 @@ char WetMap::GetWater(int x, int y)
     return m_wetMap[pixelIndex];
 }
 
+QPointF WetMap::GetVelocity(int x, int y)
+{
+    if (x < 0 || m_width <= x || y < 0 || m_height <= y)
+                    return QPointF(0,0);
+    int pixelIndex = x + y * m_width;
+    return QPointF(m_waterVelocitiesX[pixelIndex], m_waterVelocitiesY[pixelIndex]);
+}
+
 void WetMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     int i;
@@ -71,16 +81,12 @@ void WetMap::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     QImage image(m_width, m_height, QImage::Format_ARGB32_Premultiplied);
     painter->setBackground(Qt::white);
 
-//    #pragma omp parallel num_threads(1)
-    {
-//        #pragma omp for
-        for (int y = 0; y < m_height; y++)
-            for (int x = 0; x < m_width; x++) {
-                i = x + y * m_width;
-                w = this->m_wetMap[i];
-                image.setPixelColor(x, y, QColor(0, 0, 255, (int) w));
-            }
-    }
+    for (int y = 0; y < m_height; y++)
+        for (int x = 0; x < m_width; x++) {
+            i = x + y * m_width;
+            w = this->m_wetMap[i];
+            image.setPixelColor(x, y, QColor(0, 0, 255, (int) w));
+        }
     painter->drawImage(0, 0, image);
 }
 

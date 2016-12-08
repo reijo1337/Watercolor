@@ -37,6 +37,10 @@ private slots:
 
     void on_blobbChoice_clicked();
 
+    void on_checkBox_clicked(bool checked);
+
+    void on_pushButton_4_clicked();
+
 private:
     SplatScene *m_scene;
     Ui::MainWindow *ui;

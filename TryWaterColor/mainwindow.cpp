@@ -55,16 +55,19 @@ void MainWindow::on_colorPicker_clicked()
 void MainWindow::on_pushButton_clicked()
 {
     m_scene->setSplatColor(QColor(Qt::red));
+    ui->colorPicker->setStyleSheet("background-color: red;");
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
     m_scene->setSplatColor(QColor(Qt::blue));
+    ui->colorPicker->setStyleSheet("background-color: blue;");
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
     m_scene->setSplatColor(QColor(Qt::green));
+    ui->colorPicker->setStyleSheet("background-color: green;");
 }
 
 void MainWindow::on_simpleChoice_clicked()
@@ -90,4 +93,14 @@ void MainWindow::on_wetOnWetChoice_clicked()
 void MainWindow::on_blobbChoice_clicked()
 {
     m_scene->setGenerateStrategy(SplatScene::Blobby);
+}
+
+void MainWindow::on_checkBox_clicked(bool checked)
+{
+    m_scene->VisualWet(checked);
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    m_scene->ClearAll();
 }
