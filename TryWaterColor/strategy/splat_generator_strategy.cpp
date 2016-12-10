@@ -29,6 +29,10 @@ void GenSimpleBrushStrategy::Generate(SplatScene *scene, QGraphicsSceneMouseEven
         this->CreateSimpleBrush(width);
         scene->fillWetMap(m_water, event->scenePos());
         scene->RewetSplats(m_water, event->scenePos());
+    } else if (event->buttons() == Qt::RightButton) {
+        this->CreateSimpleBrush(width);
+        scene->fillWetMap(m_water, event->scenePos());
+        scene->RewetSplats(m_water, event->scenePos());
     }
 }
 
@@ -58,8 +62,13 @@ void GenWetOnDryBrush::Generate(SplatScene *scene, QGraphicsSceneMouseEvent *eve
                                  d, 30, 0.5f * radialSpeed, 1.f, radialSpeed, paintColor);
             scene->addItem(newsplat);
             scene->pushBackSplat(newsplat);
-            scene->RewetSplats(m_water, event->scenePos());
         }
+
+        scene->RewetSplats(m_water, event->scenePos());
+    } else if (event->buttons() == Qt::RightButton) {
+        this->CreateSimpleBrush(width);
+        scene->fillWetMap(m_water, event->scenePos());
+        scene->RewetSplats(m_water, event->scenePos());
     }
 }
 
@@ -75,6 +84,10 @@ void GenCruncyBrush::Generate(SplatScene *scene, QGraphicsSceneMouseEvent *event
                                     15, 5, 0.25f, 2.f, paintColor);
         scene->addItem(newsplat);
         scene->pushBackSplat(newsplat);
+        scene->RewetSplats(m_water, event->scenePos());
+    } else if (event->buttons() == Qt::RightButton) {
+        this->CreateSimpleBrush(width);
+        scene->fillWetMap(m_water, event->scenePos());
         scene->RewetSplats(m_water, event->scenePos());
     }
 }
@@ -99,6 +112,10 @@ void GenWetOnWetBrush::Generate(SplatScene *scene, QGraphicsSceneMouseEvent *eve
                                     15, 5, 1.f, 2.f, paintColor);
         scene->addItem(newsplat);
         scene->pushBackSplat(newsplat);
+        scene->RewetSplats(m_water, event->scenePos());
+    } else if (event->buttons() == Qt::RightButton) {
+        this->CreateSimpleBrush(width);
+        scene->fillWetMap(m_water, event->scenePos());
         scene->RewetSplats(m_water, event->scenePos());
     }
 }
@@ -135,7 +152,11 @@ void GenBlobbyBrush::Generate(SplatScene *scene, QGraphicsSceneMouseEvent *event
                                  15, 5, 1.f, 2.f, paintColor);
             scene->addItem(newsplat);
             scene->pushBackSplat(newsplat);
-            scene->RewetSplats(m_water, event->scenePos());
         }
+        scene->RewetSplats(m_water, event->scenePos());
+    } else if (event->buttons() == Qt::RightButton) {
+        this->CreateSimpleBrush(width);
+        scene->fillWetMap(m_water, event->scenePos());
+        scene->RewetSplats(m_water, event->scenePos());
     }
 }

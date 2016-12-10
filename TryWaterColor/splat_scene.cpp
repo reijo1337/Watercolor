@@ -6,21 +6,28 @@
 void SplatScene::update()
 {
     int checkSplat;
-        foreach (Splat* splat, *m_active) {
-            checkSplat = splat->UpdateShape(m_wetMap);
 
-            if (checkSplat == Splat::Fixed)
-            {
-                m_fixed->push_back(splat);
-                m_active->removeOne(splat);
-            }
-            if (checkSplat == Splat::Dried)
-            {
-                m_fixed->removeOne(splat);
-            }
+    foreach (Splat* splat, *m_active) {
+        checkSplat = splat->UpdateShape(m_wetMap);
+
+        if (checkSplat == Splat::Fixed)
+        {
+            m_fixed->push_back(splat);
+            m_active->removeOne(splat);
         }
+    }
 
-        m_wetMap->UpdateMap();
+    foreach (Splat* splat, *m_fixed) {
+        checkSplat = splat->UpdateShape(m_wetMap);
+
+        if (checkSplat == Splat::Dried)
+        {
+            m_dried->push_back(splat);
+            m_fixed->removeOne(splat);
+        }
+    }
+
+    m_wetMap->UpdateMap();
 }
 
 void SplatScene::updateBrushWidth(int width)
@@ -46,6 +53,7 @@ SplatScene::SplatScene() : m_splatColor(QColor(Qt::red)), m_brushWidth(45)
     this->addItem(m_cursor);
     m_active = new QList<Splat*>();
     m_fixed = new QList<Splat*>();
+    m_dried = new QList<Splat*>();
     m_startTime = QTime::currentTime();
     timer = new QTimer();
     timer->setInterval(33);
@@ -157,24 +165,28 @@ void SplatScene::ClearAll()
     foreach (Splat* splat, *m_fixed) {
         this->removeItem(splat);
     }
+    foreach (Splat* splat, *m_dried) {
+        this->removeItem(splat);
+    }
+
     m_active->clear();
     m_fixed->clear();
+    m_dried->clear();
     m_wetMap->Clear();
 }
 
 void SplatScene::RewetSplats(WaterRegion *m_water, QPointF pos)
 {
-//    QList<int> spltIndex;
-//    for (int i = 0; i < m_fixed->length(); i++) {
-//        if (splat->RewetShape(m_water, m_wetMap, pos) == Splat::Flowing)
-//            spltIndex.push_back(i);
-//    }
+    QList<Splat*> buf = *m_fixed;
+    Splat* bufSplt;
 
-    foreach (Splat* splat, *m_fixed) {
-        if (splat->RewetShape(m_water, m_wetMap, pos) == Splat::Flowing) {
-            m_active->push_back(splat);
-            m_fixed->removeOne(splat);
+    //#pragma omp parallel for
+    for (int i = 0; i < buf.length(); i++) {
+        bufSplt = buf.at(i);
+        if (bufSplt->RewetShape(m_water, m_wetMap, pos) == Splat::Flowing) {
+            m_active->push_back(bufSplt);
+            m_fixed->removeOne(bufSplt);
         }
-
     }
+    qDebug() << m_fixed->length() << endl;
 }

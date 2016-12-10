@@ -11,10 +11,10 @@ double get_random(qreal min, qreal max)
 
 
 Splat::Splat(QPointF offset, int width, QColor splatColor)
-    : m_life(60), m_roughness(1.f), m_flow(1.f),
+    : m_life(30), m_roughness(1.f), m_flow(1.f),
       m_motionBias(QPointF(0.f, 0.f)), m_initColor(splatColor)
 {
-    m_fix = 60;
+    m_fix = 240;
     m_initColor.setAlpha(50);
 
     int r = width / 2;
@@ -37,10 +37,10 @@ Splat::Splat(QPointF offset, int width, QColor splatColor)
 }
 
 Splat::Splat(QPointF offset, QPointF velocityBias, int width, int life, qreal roughness, qreal flow, qreal radialSpeed, QColor splatColor)
-    : m_life(2*life), m_roughness(roughness), m_flow(flow),
+    : m_life(life), m_roughness(roughness), m_flow(flow),
       m_motionBias(velocityBias), m_initColor(splatColor)
 {
-    m_fix = 60;
+    m_fix = 240;
     m_initColor.setAlpha(50);
     int r = width / 2;
     int n = 128;
@@ -157,6 +157,7 @@ qreal Splat::CalcSize()
 {
     if (m_vertices.length() < 3)
         return 0.f;
+
     QPointF v0 = m_vertices[0];
     qreal v0x = v0.x();
     qreal v0y = v0.y();
@@ -165,6 +166,7 @@ qreal Splat::CalcSize()
     qreal e0y = e0.y();
     qreal s = 0.f;
     int length = m_vertices.length();
+
     for (int i = 2; i < length; i++) {
         QPointF v2 = m_vertices[i];
         qreal e1x = v2.x() - v0x;
