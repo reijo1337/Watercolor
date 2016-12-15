@@ -17,6 +17,7 @@ class SplatGeneratorStrategy;
 
 // TODO: Настройки кисти, полупрозрачность, смешание, счетчики производительности
 // подложка текстуры бумаги.
+// Квадратичное дерево для оптимизации
 class SplatScene : public QGraphicsScene
 {
     Q_OBJECT

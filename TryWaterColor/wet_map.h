@@ -50,7 +50,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                      QWidget *widget);
     void Clear() {
-        prepareGeometryChange();
+        //prepareGeometryChange();
 
         int i;
         for (int y = 0; y < m_height; y++)
@@ -61,7 +61,7 @@ public:
                 this->m_waterVelocitiesY[i] = 0;
             }
 
-        this->update(this->boundingRect());
+        //this->update(this->boundingRect());
     }
 
 private:

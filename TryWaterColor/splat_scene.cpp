@@ -1,6 +1,7 @@
 #include "splat_scene.h"
 #include <QVector2D>
 #include <omp.h>
+#include <QMutex>
 
 // This method updates all splats and wet map
 void SplatScene::update()
@@ -159,34 +160,36 @@ void SplatScene::VisualWet(bool wha)
 void SplatScene::ClearAll()
 {
     timer->stop();
-    foreach (Splat* splat, *m_active) {
-        this->removeItem(splat);
-    }
-    foreach (Splat* splat, *m_fixed) {
-        this->removeItem(splat);
-    }
-    foreach (Splat* splat, *m_dried) {
-        this->removeItem(splat);
-    }
 
+    this->clear();
     m_active->clear();
     m_fixed->clear();
     m_dried->clear();
-    m_wetMap->Clear();
+
+    m_cursor = new QGraphicsEllipseItem(0,0,m_brushWidth, m_brushWidth);
+    m_cursor->hide();
+    this->addItem(m_cursor);
+
+    m_wetMap = new WetMap(this->width(), this->height());
+    this->addItem(m_wetMap);
+    m_wetMap->hide();
 }
 
 void SplatScene::RewetSplats(WaterRegion *m_water, QPointF pos)
 {
     QList<Splat*> buf = *m_fixed;
     Splat* bufSplt;
+    QMutex locker;
+    int i;
 
-    //#pragma omp parallel for
-    for (int i = 0; i < buf.length(); i++) {
+    #pragma omp parallel for
+    for (i = 0; i < buf.length(); i++) {
         bufSplt = buf.at(i);
         if (bufSplt->RewetShape(m_water, m_wetMap, pos) == Splat::Flowing) {
+            locker.lock();
             m_active->push_back(bufSplt);
             m_fixed->removeOne(bufSplt);
+            locker.unlock();
         }
     }
-    qDebug() << m_fixed->length() << endl;
 }

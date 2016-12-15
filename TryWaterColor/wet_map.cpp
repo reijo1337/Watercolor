@@ -37,23 +37,17 @@ void WetMap::UpdateMap()
 void WetMap::Fill(WaterRegion *wetPlace, QPointF pos)
 {
     prepareGeometryChange();
-    QPointF p;
-    QPointF pr;
     foreach (QPoint wetDot, *wetPlace) {
         int x = wetDot.x() + pos.x();
         int y = wetDot.y() + pos.y();
         if (x < 0 || m_width <= x || y < 0 || m_height <= y)
             continue;
 
-        p.setX(2.f * (qreal) wetDot.x() / wetDot.manhattanLength());
-        p.setX(2.f * (qreal) wetDot.y() / wetDot.manhattanLength());
         int pixIndex = x + y * m_width;
         m_wetMap[pixIndex] = 255;
 
-        pr = QPointF(m_waterVelocitiesX[pixIndex], m_waterVelocitiesY[pixIndex]) + p;
-
-        m_waterVelocitiesX[pixIndex] = 2.f * pr.x() / pr.manhattanLength();
-        m_waterVelocitiesY[pixIndex] = 2.f * pr.y() / pr.manhattanLength();
+        m_waterVelocitiesX[pixIndex] = 4.f * wetDot.x() / wetDot.manhattanLength();
+        m_waterVelocitiesY[pixIndex] = 4.f * wetDot.y() / wetDot.manhattanLength();
     }
     this->update(this->boundingRect());
 }

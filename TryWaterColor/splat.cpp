@@ -14,7 +14,7 @@ Splat::Splat(QPointF offset, int width, QColor splatColor)
     : m_life(30), m_roughness(1.f), m_flow(1.f),
       m_motionBias(QPointF(0.f, 0.f)), m_initColor(splatColor)
 {
-    m_fix = 240;
+    m_fix = 225;
     m_initColor.setAlpha(50);
 
     int r = width / 2;
@@ -40,7 +40,7 @@ Splat::Splat(QPointF offset, QPointF velocityBias, int width, int life, qreal ro
     : m_life(life), m_roughness(roughness), m_flow(flow),
       m_motionBias(velocityBias), m_initColor(splatColor)
 {
-    m_fix = 240;
+    m_fix = 225;
     m_initColor.setAlpha(50);
     int r = width / 2;
     int n = 128;
@@ -109,9 +109,9 @@ int Splat::UpdateShape(WetMap *wetMap)
     m_life--;
     prepareGeometryChange();
 
-    #pragma omp parallel
+    //#pragma omp parallel
     {
-        #pragma omp for
+        //#pragma omp for
         for (int i = 0; i < m_vertices.length(); i++) {
             QPointF x = m_vertices[i];
             QPointF v = m_velocities[i];
@@ -126,6 +126,12 @@ int Splat::UpdateShape(WetMap *wetMap)
         }
     }
 
+    if (!m_life) {
+        for (int i = 0; i < m_vertices.length(); i++) {
+            m_velocities[i] = QPointF(0, 0);
+        }
+    }
+
     this->update(this->boundingRect());
     return Splat::Flowing;
 }
@@ -133,21 +139,19 @@ int Splat::UpdateShape(WetMap *wetMap)
 int Splat::RewetShape(WaterRegion *wetPlace, WetMap *wetMap, QPointF &pos)
 {
     int howMuch = 0;
-    #pragma omp parallel
-    {
-        #pragma omp for
-        for (int i = 0; i < m_vertices.length(); i++) {
+    int i;
+        #pragma omp parallel for
+        for (i = 0; i < m_vertices.length(); i++) {
             if (wetPlace->contains((m_vertices[i] - pos).toPoint())) {
                 m_velocities[i] = wetMap->GetVelocity(m_vertices[i].toPoint().x(),
                                                       m_vertices[i].toPoint().y());
                 howMuch++;
             }
         }
-    }
 
     if (howMuch) {
         m_life = 30;
-        m_fix = 30;
+        m_fix = 225;
         return Splat::Flowing;
     } else
         return Splat::Fixed;

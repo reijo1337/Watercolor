@@ -26,6 +26,16 @@ MainWindow::MainWindow(QWidget *parent) :
     myPalette.setColor( ui->colorPicker->backgroundRole(), QColor(255,0,0) );
     ui->colorPicker->setStyleSheet("background-color: " + QColor(Qt::red).name() + ";");
 
+    ui->c_D54A9E->setStyleSheet("background-color: #D54A9E;");
+    ui->c_D54A63->setStyleSheet("background-color: #D54A63;");
+    ui->c_D5A74A->setStyleSheet("background-color: #D5A74A;");
+    ui->c_B6D54A->setStyleSheet("background-color: #B6D54A;");
+    ui->c_4AD57A->setStyleSheet("background-color: #4AD57A;");
+    ui->c_4AB6D5->setStyleSheet("background-color: #4AB6D5;");
+    ui->c_6C4AD5->setStyleSheet("background-color: #6C4AD5;");
+    ui->c_954AD5->setStyleSheet("background-color: #954AD5;");
+    ui->c_D2CB6B->setStyleSheet("background-color: #D2CB6B;");
+
     connect(ui->brushSize, SIGNAL(valueChanged(int)), m_scene, SLOT(updateBrushWidth(int)));
 }
 
@@ -50,24 +60,6 @@ void MainWindow::on_colorPicker_clicked()
 
     ui->colorPicker->setStyleSheet("background-color: " + getColor.name() + ";");
     m_scene->setSplatColor(getColor);
-}
-
-void MainWindow::on_pushButton_clicked()
-{
-    m_scene->setSplatColor(QColor(Qt::red));
-    ui->colorPicker->setStyleSheet("background-color: red;");
-}
-
-void MainWindow::on_pushButton_2_clicked()
-{
-    m_scene->setSplatColor(QColor(Qt::blue));
-    ui->colorPicker->setStyleSheet("background-color: blue;");
-}
-
-void MainWindow::on_pushButton_3_clicked()
-{
-    m_scene->setSplatColor(QColor(Qt::green));
-    ui->colorPicker->setStyleSheet("background-color: green;");
 }
 
 void MainWindow::on_simpleChoice_clicked()
@@ -103,4 +95,58 @@ void MainWindow::on_checkBox_clicked(bool checked)
 void MainWindow::on_pushButton_4_clicked()
 {
     m_scene->ClearAll();
+}
+
+void MainWindow::on_c_D54A9E_clicked()
+{
+    m_scene->setSplatColor(QColor("#D54A9E"));
+    ui->colorPicker->setStyleSheet("background-color: #D54A9E;");
+}
+
+void MainWindow::on_c_D54A63_clicked()
+{
+    m_scene->setSplatColor(QColor("#D54A63"));
+    ui->colorPicker->setStyleSheet("background-color: #D54A63;");
+}
+
+void MainWindow::on_c_D5A74A_clicked()
+{
+    m_scene->setSplatColor(QColor("#D5A74A"));
+    ui->colorPicker->setStyleSheet("background-color: #D5A74A;");
+}
+
+void MainWindow::on_c_B6D54A_clicked()
+{
+    m_scene->setSplatColor(QColor("#B6D54A"));
+    ui->colorPicker->setStyleSheet("background-color: #B6D54A;");
+}
+
+void MainWindow::on_c_4AD57A_clicked()
+{
+    m_scene->setSplatColor(QColor("#4AD57A"));
+    ui->colorPicker->setStyleSheet("background-color: #4AD57A;");
+}
+
+void MainWindow::on_c_4AB6D5_clicked()
+{
+    m_scene->setSplatColor(QColor("#4AB6D5"));
+    ui->colorPicker->setStyleSheet("background-color: #4AB6D5;");
+}
+
+void MainWindow::on_c_6C4AD5_clicked()
+{
+    m_scene->setSplatColor(QColor("#6C4AD5"));
+    ui->colorPicker->setStyleSheet("background-color: #6C4AD5;");
+}
+
+void MainWindow::on_c_954AD5_clicked()
+{
+    m_scene->setSplatColor(QColor("#954AD5"));
+    ui->colorPicker->setStyleSheet("background-color: #954AD5;");
+}
+
+void MainWindow::on_c_D2CB6B_clicked()
+{
+    m_scene->setSplatColor(QColor("#D2CB6B"));
+    ui->colorPicker->setStyleSheet("background-color: #D2CB6B;");
 }
